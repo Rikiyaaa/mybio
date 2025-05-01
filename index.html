@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bio Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            color: #f0f0f0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background-color: #0a0a0a;
+        }
+        
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        
+        .container {
+    max-width: 500px;
+    width: 90%;
+    padding: 30px;
+    background-color: rgba(26, 26, 26, 0.3); /* เปลี่ยนจาก 0.85 เป็น 0.6 เพื่อเพิ่มความโปร่งใส */
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* ลดความเข้มของเงาลงเล็กน้อย */
+    backdrop-filter: blur(5px); /* เพิ่มความเบลอของพื้นหลังเพื่อให้อ่านง่ายขึ้นแม้จะโปร่งใสมากขึ้น */
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: transform 0.1s ease;
+    opacity: 0;
+    display: none;
+    margin: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* เพิ่มขอบบางๆ ให้ card ดูมีมิติมากขึ้น */
+    position: relative; /* เพิ่ม position relative สำหรับการวาง visitor counter */
+}
+        
+        .profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #2e2e2e;
+            transform: translateZ(20px);
+        }
+        
+        .username {
+            margin-top: 15px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transform: translateZ(15px);
+            position: relative;
+            height: 28px; /* Set fixed height to prevent layout shift */
+            display: inline-block;
+        }
+        
+        /* Cursor for typing effect */
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 24px;
+            background-color: #f0f0f0;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: middle;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .bio {
+            margin-top: 10px;
+            color: #b0b0b0;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.5;
+            transform: translateZ(10px);
+        }
+        
+        .links {
+    display: flex;
+    flex-direction: row; /* เปลี่ยนจาก column เป็น row */
+    gap: 20px; /* เพิ่มระยะห่างระหว่าง icon */
+    justify-content: center; /* จัดให้อยู่ตรงกลาง */
+    margin: 20px 0; /* เพิ่มระยะห่างด้านบนและล่าง */
+    flex-wrap: wrap; /* ในกรณีหน้าจอเล็ก จะได้ขึ้นบรรทัดใหม่ */
+}
+
+/* ปรับแต่ง style ของปุ่ม link ให้เป็นแค่ icon กลม */
+.link {
+    background-color: rgba(37, 37, 37, 0.7); /* ปรับความโปร่งใสของพื้นหลัง */
+    padding: 12px; /* ปรับให้เป็นสี่เหลี่ยมจัตุรัส */
+    border-radius: 50%; /* ทำให้เป็นวงกลม */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* จัดให้ icon อยู่ตรงกลาง */
+    text-decoration: none;
+    color: #f0f0f0;
+    transition: all 0.3s ease;
+    transform: translateZ(5px);
+    width: 45px; /* กำหนดความกว้าง */
+    height: 45px; /* กำหนดความสูง */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* เพิ่มขอบบางๆ */
+}
+
+/* ซ่อนข้อความ มีแต่ icon */
+.link span {
+    display: none; /* ซ่อนข้อความ */
+}
+
+/* เพิ่ม effect hover */
+.link:hover {
+    background-color: rgba(48, 48, 48, 0.9);
+    transform: translateY(-2px) translateZ(5px) scale(1.1); /* เพิ่ม scale เมื่อ hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* เพิ่มเงาเมื่อ hover */
+}
+
+/* ทำให้ icon ใหญ่ขึ้นเล็กน้อย */
+.link svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+    .links {
+        gap: 15px; /* ลดระยะห่างบนมือถือ */
+    }
+    
+    .link {
+        width: 40px; /* ลดขนาดบนมือถือ */
+        height: 40px;
+        padding: 10px;
+    }
+    
+    .link svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            transform: translateZ(10px);
+        }
+        
+        .badge {
+            background-color: #252525;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            color: #aaa;
+            font-weight: 500;
+        }
+        
+        /* Enter Screen Styles */
+        #enter-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a0a0a;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        .enter-content {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .enter-content:hover {
+            transform: scale(1.05);
+        }
+        
+        .enter-content h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .enter-button {
+            font-size: 16px;
+            color: #aaa;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 1px solid #444;
+            padding: 12px 24px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            background: transparent;
+            cursor: pointer;
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        .enter-button:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: #666;
+        }
+        
+        /* Loading Screen Styles */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a0a0a;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-content {
+            text-align: center;
+            width: 90%;
+            max-width: 300px;
+        }
+        
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #333;
+            border-bottom-color: #f0f0f0;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loading-text {
+            font-size: 16px;
+            color: #aaa;
+            letter-spacing: 3px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background-color: #222;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        
+        /* Music Player Styles */
+        .music-player {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            transform: translateZ(10px);
+        }
+        
+        .album-cover {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            margin-right: 12px;
+            object-fit: cover;
+            background-color: #333;
+            flex-shrink: 0;
+        }
+        
+        .music-info {
+            flex: 1;
+            padding-right: 15px;
+            overflow: hidden;
+        }
+        
+        .music-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #f0f0f0;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .music-artist {
+            font-size: 12px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .play-btn {
+            background-color: #333;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .play-btn:hover {
+            background-color: #444;
+        }
+        
+        .play-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: #f0f0f0;
+        }
+        
+        .music-timeline {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            background-color: #333;
+            border-radius: 2px;
+            margin-top: 8px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .music-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background-color: #f0f0f0;
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+        
+        .music-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #777;
+            margin-top: 5px;
+        }
+        
+        /* Fade animations */
+        .fade-in {
+            animation: fadeIn 1s forwards;
+        }
+        
+        .fade-out {
+            animation: fadeOut 1s forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
+        
+        /* Music wave animation */
+        
+        .wave-bar {
+            width: 2px;
+            background-color: #f0f0f0;
+            border-radius: 1px;
+            transition: height 0.2s ease;
+        }
+        
+        .wave-bar.playing {
+            animation: wave 1s infinite alternate;
+        }
+        
+        .wave-bar:nth-child(1) { animation-delay: 0.0s; }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+        
+        @keyframes wave {
+            0% { height: 4px; }
+            100% { height: 16px; }
+        }
+        
+        /* SoundCloud iframe container */
+        .soundcloud-container {
+            display: none;
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .profile img {
+                width: 100px; 
+                height: 100px;
+            }
+            
+            .username {
+                font-size: 20px;
+            }
+            
+            .bio {
+                font-size: 14px;
+            }
+            
+            .link {
+                padding: 10px 12px;
+            }
+            
+            .link span {
+                font-size: 14px;
+            }
+            
+            .album-cover {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        .discord-profile {
+    background-color: #2a2d31;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    transform: translateZ(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.discord-avatar {
+    position: relative;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.discord-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #333;
+}
+
+.discord-status {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    bottom: 0;
+    right: 0;
+    border: 2px solid #2a2d31;
+}
+
+.discord-status.online {
+    background-color: #3ba55c;
+}
+
+.discord-status.idle {
+    background-color: #faa61a;
+}
+
+.discord-status.dnd {
+    background-color: #ed4245;
+}
+
+.discord-status.offline {
+    background-color: #747f8d;
+}
+
+.discord-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.discord-username {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.discord-tag {
+    color: #b9bbbe;
+    font-weight: 400;
+}
+
+.discord-activity {
+    font-size: 12px;
+    color: #b9bbbe;
+}
+
+.discord-activity-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 2px;
+}
+
+.discord-activity-status svg {
+    width: 12px;
+    height: 12px;
+    color: #b9bbbe;
+}
+
+.discord-time {
+    font-size: 10px;
+    color: #72767d;
+}
+
+/* For smaller screens */
+@media (max-width: 480px) {
+    .discord-avatar img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .discord-username {
+        font-size: 14px;
+    }
+}
+
+.discord-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.discord-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  background-color: #36393f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.discord-badge img {
+  width: 16px;
+  height: 16px;
+}
+
+.discord-badge:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #18191c;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-bottom: 6px;
+  z-index: 10;
+}
+
+.username-decoration {
+  display: inline-flex;
+  margin-right: 4px;
+}
+
+.discord-profile-decorations {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Visitor Counter Styles */
+.visitor-counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(26, 26, 26, 0.7);
+    padding: 6px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    transform: translateZ(20px);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.visitor-counter:hover {
+    background-color: rgba(48, 48, 48, 0.9);
+    transform: translateZ(20px) scale(1.05);
+}
+
+.visitor-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.visitor-count {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 480px) {
+    .visitor-counter {
+        padding: 5px 8px;
+        font-size: 10px;
+        top: 8px;
+        left: 8px;
+    }
+    
+    .visitor-icon svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Click to Enter Screen -->
+    <div id="enter-screen">
+        <div class="enter-content">
+            <h1>@username</h1>
+            <button class="enter-button">Enter</button>
+            <p id="music-consent" style="margin-top: 10px; font-size: 12px; color: #666;">กดเพื่อเข้าชมโปรไฟล์และเล่นเพลง</p>
+        </div>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <span class="loader"></span>
+            <div class="loading-text">LOADING</div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Video Background -->
+    <video id="video-background" autoplay muted loop playsinline>
+        <source src="https://r2.guns.lol/c4acc28c-4050-4c8c-9031-1f63ab316a18.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+    
+    <!-- Main Content -->
+    <div class="container" id="tilt-card">
+        <!-- Visitor Counter -->
+        <div class="visitor-counter" id="visitor-counter">
+            <div class="visitor-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div class="visitor-count" id="visitor-count">53</div>
+        </div>
+
+        <div class="profile">
+            <img src="https://media.discordapp.net/attachments/1306593880224960585/1367345916285288499/415514076_371710592204535_3568494204998897728_n.jpg?ex=68143f9e&is=6812ee1e&hm=768b0456bfc91cc56a05c35dbf4d03496a829c0e80b01f90b928ead635a115f4&=&format=webp&width=847&height=847" alt="Profile Picture">
+            <div class="username-container">
+                <span class="username"></span>
+                <span class="typing-cursor"></span>
+            </div>
+            <div class="bio">developer • designer • creator</div>
+            
+            <div class="badges">
+                <div class="badge">17 y/o</div>
+                <div class="badge">กรุงเทพฯ</div>
+                <div class="badge">HTML/CSS</div>
+                <div class="badge">JavaScript</div>
+            </div>
+        </div>
+
+         <!-- Discord Profile -->
+<div class="discord-profile">
+    <div class="discord-avatar">
+        <div class="discord-status" id="discord-status-indicator"></div>
+        <img src="/api/placeholder/128/128" alt="Discord Avatar" id="discord-avatar">
+    </div>
+    <div class="discord-info">
+        <div class="discord-username" id="discord-username">กำลังโหลด...
+        </div>
+        <div class="discord-badges" id="discord-badges">
+
+        </div>
+        <div class="discord-activity">
+            <div class="discord-activity-status">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span id="discord-status-text">กำลังโหลดสถานะ...</span>
+            </div>
+            <div class="discord-time" id="discord-time">กำลังดึงข้อมูล</div>
+        </div>
+    </div>
+</div>
+        
+        <!-- Music Player -->
+        <div class="music-player">
+            <img src="/api/placeholder/300/300" alt="Album Cover" class="album-cover" id="album-cover">
+            <div class="music-wave">
+            </div>
+            <div class="music-info">
+                <div class="music-title">Monkey Juice</div>
+                <div class="music-artist">1MILL</div>
+                <div class="music-timeline">
+                    <div class="music-progress" id="music-progress"></div>
+                </div>
+                <div class="music-time">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            <div class="music-controls">
+                <button class="play-btn" id="play-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="play-icon">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="pause-icon" style="display: none;">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="links">
+            <a href="#" class="link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+                <span>LinkedIn</span>
+            </a>
+            <a href="#" class="link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                <span>GitHub</span>
+            </a>
+            <a href="#" class="link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                </svg>
+                <span>Twitter</span>
+            </a>
+            <a href="#" class="link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                <span>Instagram</span>
+            </a>
+            <a href="#" class="link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span>Discord</span>
+            </a>
+        </div>
+        
+        <div class="footer">
+            © 2025 • คุณสามารถปรับแต่งหน้าเว็บนี้ได้ตามต้องการ
+        </div>
+    </div>
+
+    <!-- Audio Element (Hidden) -->
+    <audio id="bg-music" loop>
+        <source src="" type="audio/mpeg">
+    </audio>
+    
+    <!-- Hidden SoundCloud iframe for API access -->
+    <div class="soundcloud-container">
+        <iframe id="soundcloud-widget" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" 
+                src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/zpoomzk/monkey-juice-1mill&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false"></iframe>
+    </div>
+
+    <script src="https://w.soundcloud.com/player/api.js"></script>
+    <script src="mouse-trail.js"></script>
+    <script src="discord-integration.js"></script>
+    <script>
+
+
+// เรียกใช้ฟังก์ชันหลักเมื่อโหลดเว็บเสร็จ
+document.addEventListener('DOMContentLoaded', function() {
+    // ตรวจสอบว่ามีฟังก์ชัน showMainContent อยู่แล้วหรือไม่
+    const originalShowMainContent = window.showMainContent;
+    
+    if (typeof originalShowMainContent === 'function') {
+        // ถ้ามีฟังก์ชัน showMainContent อยู่แล้ว ให้ override มัน
+        window.showMainContent = function() {
+            originalShowMainContent();
+            setTimeout(initDiscordProfile, 1000);
+        };
+    } else {
+        // ถ้าไม่มีฟังก์ชัน showMainContent ให้เรียกใช้ฟังก์ชันโดยตรง
+        setTimeout(initDiscordProfile, 1000);
+    }
+});
+
+// สร้างฟังก์ชัน fallback ในกรณีที่เกิดข้อผิดพลาดกับ API
+window.addEventListener('error', function(e) {
+    if (e.message.includes('Discord') || e.filename.includes('discord')) {
+        console.log('Discord API error detected, falling back to mock data');
+        fallbackToMockData();
+    }
+});
+        // Username Typing Effect
+        class TypingEffect {
+            constructor(element, options = {}) {
+                this.element = element;
+                this.phrases = options.phrases || ['@username'];
+                this.typingSpeed = options.typingSpeed || 150;
+                this.deletingSpeed = options.deletingSpeed || 100;
+                this.pauseBeforeDelete = options.pauseBeforeDelete || 2000;
+                this.pauseBeforeType = options.pauseBeforeType || 500;
+                this.currentPhrase = 0;
+                this.currentText = '';
+                this.isDeleting = false;
+                this.timeout = null;
+            }
+            
+            type() {
+                // Get the current phrase
+                const fullPhrase = this.phrases[this.currentPhrase];
+                
+                // If deleting
+                if (this.isDeleting) {
+                    // Remove last character
+                    this.currentText = fullPhrase.substring(0, this.currentText.length - 1);
+                } else {
+                    // Add the next character
+                    this.currentText = fullPhrase.substring(0, this.currentText.length + 1);
+                }
+                
+                // Update the element
+                this.element.textContent = this.currentText;
+                
+                // Calculate typing speed
+                let typeSpeed = this.isDeleting ? this.deletingSpeed : this.typingSpeed;
+                
+                // Randomize speed slightly for more natural feel
+                typeSpeed = Math.floor(Math.random() * (typeSpeed * 0.5)) + typeSpeed;
+                
+                // If complete with current phrase
+                if (!this.isDeleting && this.currentText === fullPhrase) {
+                    // Pause then start deleting
+                    typeSpeed = this.pauseBeforeDelete;
+                    this.isDeleting = true;
+                } else if (this.isDeleting && this.currentText === '') {
+                    // Move to next phrase
+                    this.isDeleting = false;
+                    this.currentPhrase = (this.currentPhrase + 1) % this.phrases.length;
+                    // Pause before typing next phrase
+                    typeSpeed = this.pauseBeforeType;
+                }
+                
+                // Queue next character
+                this.timeout = setTimeout(() => this.type(), typeSpeed);
+            }
+            
+            start() {
+                this.type();
+            }
+            
+            stop() {
+                clearTimeout(this.timeout);
+            }
+        }
+
+        // Card tilt effect
+        const card = document.getElementById('tilt-card');
+        
+        function setupTiltEffect() {
+            // Only setup tilt effect on non-mobile devices
+            if (window.innerWidth > 768) {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; // x position within the element
+                    const y = e.clientY - rect.top;  // y position within the element
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const deltaX = (x - centerX) / centerX;
+                    const deltaY = (y - centerY) / centerY;
+                    
+                    const tiltX = deltaY * 10; // tilt up/down
+                    const tiltY = -deltaX * 10; // tilt left/right
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    // Reset card position when mouse leaves
+                    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+                    card.style.transition = 'transform 0.5s ease';
+                });
+                
+                card.addEventListener('mouseenter', () => {
+                    // Remove transition when mouse enters for smooth tilt
+                    card.style.transition = 'none';
+                });
+            }
+        }
+        
+        // Loading and screens management
+        const enterScreen = document.getElementById('enter-screen');
+        const loadingScreen = document.getElementById('loading-screen');
+        const videoBackground = document.getElementById('video-background');
+        const progressBar = document.getElementById('progress');
+        
+        // Music player elements
+        const bgMusic = document.getElementById('bg-music');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const musicProgress = document.getElementById('music-progress');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+        const waveBars = document.querySelectorAll('.wave-bar');
+        const albumCover = document.getElementById('album-cover');
+        
+        // Username typing effect element
+        const usernameElement = document.querySelector('.username');
+        let typingEffect;
+        
+        // SoundCloud widget API
+        let scPlayer;
+        let scReady = false;
+        let scDuration = 0;
+        
+        // Initialize typing effect
+        function initTypingEffect() {
+            typingEffect = new TypingEffect(usernameElement, {
+                phrases: ['Kitsakorn'],
+                typingSpeed: 100,
+                deletingSpeed: 80,
+                pauseBeforeDelete: 2000,
+                pauseBeforeType: 500
+            });
+            typingEffect.start();
+        }
+        
+        // Initialize SoundCloud widget API
+        function initSoundCloud() {
+            const iframeElement = document.querySelector('#soundcloud-widget');
+            scPlayer = SC.Widget(iframeElement);
+            
+            scPlayer.bind(SC.Widget.Events.READY, function() {
+                scReady = true;
+                
+                // Get track info
+                scPlayer.getCurrentSound(function(sound) {
+                    if (sound) {
+                        // Set album artwork if available
+                        if (sound.artwork_url) {
+                            // Get higher resolution artwork by replacing size
+                            const artworkUrl = sound.artwork_url.replace('-large', '-t500x500');
+                            albumCover.src = artworkUrl;
+                        }
+                    }
+                });
+                
+                // Get track duration
+                scPlayer.getDuration(function(duration) {
+                    scDuration = duration;
+                    durationEl.textContent = formatTime(duration/1000); // SoundCloud returns ms
+                });
+                
+               // Auto play music after SoundCloud is ready
+                // This happens after user interaction (clicking Enter button)
+                if (enterClicked) {
+                    playMusic();
+                }
+            });
+            
+            // Setup SoundCloud event listeners
+            scPlayer.bind(SC.Widget.Events.PLAY_PROGRESS, function(e) {
+                // Update music progress bar
+                const position = e.currentPosition / 1000; // convert to seconds
+                const duration = scDuration / 1000;
+                const progressPercentage = (position / duration) * 100;
+                
+                musicProgress.style.width = `${progressPercentage}%`;
+                currentTimeEl.textContent = formatTime(position);
+            });
+            
+            scPlayer.bind(SC.Widget.Events.PLAY, function() {
+                setPlayingState(true);
+            });
+            
+            scPlayer.bind(SC.Widget.Events.PAUSE, function() {
+                setPlayingState(false);
+            });
+            
+            scPlayer.bind(SC.Widget.Events.FINISH, function() {
+                setPlayingState(false);
+                musicProgress.style.width = '0%';
+                currentTimeEl.textContent = '0:00';
+                
+                // Loop the track
+                setTimeout(() => {
+                    scPlayer.seekTo(0);
+                    scPlayer.play();
+                }, 1000);
+            });
+        }
+        
+        // Format time in MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' + secs : secs}`;
+        }
+        
+        // Set playing/paused state UI
+        function setPlayingState(isPlaying) {
+            if (isPlaying) {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+                
+                // Animate wave bars
+                waveBars.forEach(bar => {
+                    bar.classList.add('playing');
+                });
+            } else {
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                
+                // Stop wave animation
+                waveBars.forEach(bar => {
+                    bar.classList.remove('playing');
+                });
+            }
+        }
+        
+        // Play/pause music
+        function playMusic() {
+            if (scReady) {
+                scPlayer.toggle();
+            }
+        }
+        
+        // Handle music timeline clicks
+        document.querySelector('.music-timeline').addEventListener('click', function(e) {
+            if (scReady) {
+                const timeline = this.getBoundingClientRect();
+                const clickPosition = (e.clientX - timeline.left) / timeline.width;
+                const seekTime = Math.floor(clickPosition * (scDuration / 1000)) * 1000; // Convert to ms
+                
+                scPlayer.seekTo(seekTime);
+            }
+        });
+        
+        // Handle play button click
+        playBtn.addEventListener('click', function() {
+            playMusic();
+        });
+        
+        // Loading simulation
+        let loadingProgress = 0;
+        let enterClicked = false;
+        
+        function simulateLoading() {
+            const interval = setInterval(() => {
+                loadingProgress += Math.random() * 10;
+                if (loadingProgress > 100) loadingProgress = 100;
+                
+                progressBar.style.width = `${loadingProgress}%`;
+                
+                if (loadingProgress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showMainContent();
+                    }, 500);
+                }
+            }, 200);
+        }
+        
+        // Show main content after loading
+        function showMainContent() {
+            loadingScreen.classList.add('fade-out');
+            
+            // Show video background
+            videoBackground.style.opacity = '1';
+            
+            // Show main container
+            setTimeout(() => {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    // Initialize typing effect
+                    initTypingEffect();
+                    // Setup tilt effect
+                    setupTiltEffect();
+                }, 100);
+            }, 500);
+        }
+        
+        // Handle enter button click
+        enterScreen.addEventListener('click', function() {
+            enterClicked = true;
+            
+            // Show loading screen
+            enterScreen.classList.add('fade-out');
+            loadingScreen.style.opacity = '1';
+            loadingScreen.style.visibility = 'visible';
+            
+            // Initialize SoundCloud player
+            initSoundCloud();
+            
+            // Start loading simulation
+            simulateLoading();
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-load video
+            videoBackground.addEventListener('loadeddata', function() {
+                console.log('Video loaded and ready to play');
+            });
+            
+            videoBackground.addEventListener('error', function(e) {
+                console.error('Error loading video:', e);
+            });
+        });
+        
+        // Handle music timeline input
+        document.querySelector('.music-timeline').addEventListener('mousedown', function(e) {
+            if (scReady) {
+                const timeline = this.getBoundingClientRect();
+                const clickPosition = (e.clientX - timeline.left) / timeline.width;
+                const seekTime = Math.floor(clickPosition * (scDuration / 1000)) * 1000; // Convert to ms
+                
+                scPlayer.seekTo(seekTime);
+            }
+        });
+        
+        // Add support for mobile device tilt using device orientation
+        window.addEventListener('deviceorientation', function(event) {
+            if (window.innerWidth <= 768) { // Only for mobile devices
+                const tiltX = event.beta / 5; // Convert to smaller range
+                const tiltY = event.gamma / 5;
+                
+                // Apply tilt effect with limitations for better UX
+                if (tiltX !== null && tiltY !== null) {
+                    const limitedTiltX = Math.max(-10, Math.min(10, tiltX));
+                    const limitedTiltY = Math.max(-10, Math.min(10, tiltY));
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${-limitedTiltX}deg) rotateY(${limitedTiltY}deg)`;
+                }
+            }
+        });
+        
+        // Handle window resize for responsive behavior
+        window.addEventListener('resize', function() {
+            // Disable tilt effect on small screens
+            if (window.innerWidth <= 768) {
+                card.style.transform = 'none';
+                card.style.transition = 'none';
+                // Remove mouse events for tilt
+                card.removeEventListener('mousemove', handleMouseMove);
+                card.removeEventListener('mouseleave', handleMouseLeave);
+                card.removeEventListener('mouseenter', handleMouseEnter);
+            } else {
+                // Re-enable tilt effect on larger screens
+                setupTiltEffect();
+            }
+        });
+        
+        // Preload images function (for album art, profile picture)
+        function preloadImages(urls) {
+            urls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+        }
+        
+        // Update profile information function
+        function updateProfile(username, bio, badges) {
+            // Update username for typing effect
+            if (typingEffect) {
+                typingEffect.stop();
+            }
+            
+            typingEffect = new TypingEffect(usernameElement, {
+                phrases: username,
+                typingSpeed: 100,
+                deletingSpeed: 80,
+                pauseBeforeDelete: 2000,
+                pauseBeforeType: 500
+            });
+            
+            // Update bio
+            document.querySelector('.bio').textContent = bio;
+            
+            // Update badges
+            const badgesContainer = document.querySelector('.badges');
+            badgesContainer.innerHTML = '';
+            
+            badges.forEach(badge => {
+                const badgeEl = document.createElement('div');
+                badgeEl.className = 'badge';
+                badgeEl.textContent = badge;
+                badgesContainer.appendChild(badgeEl);
+            });
+            
+            // Start typing effect
+            typingEffect.start();
+        }
+        
+        // Optional: Add dark/light mode toggle
+        function toggleDarkMode() {
+            const body = document.body;
+            const isDark = body.classList.contains('light-mode');
+            
+            if (isDark) {
+                body.classList.remove('light-mode');
+            } else {
+                body.classList.add('light-mode');
+            }
+        }
+    </script>
+</body>
+</html>
