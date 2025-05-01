@@ -12,7 +12,7 @@ const CONFIG = {
     // เปลี่ยนเป็น URL ของ API server ของคุณ
     apiUrl: 'https://discord-info-api.onrender.com/api/discord',
     // เปลี่ยนเป็น URL ของ WebSocket server ของคุณ
-    websocketUrl: 'wss://http://localhost:3001',  // ไม่จำเป็นต้องกำหนดพอร์ต 3001
+    websocketUrl: 'wss://https://discord-info-api.onrender.com',  // ไม่จำเป็นต้องกำหนดพอร์ต 3001
     // Discord User ID ที่ต้องการแสดงข้อมูล (ต้องตรงกับที่ตั้งค่าในฝั่ง backend)
     userId: '918384557131173988',
     // API key ถ้ามีการตั้งค่าในฝั่ง backend
